@@ -1,0 +1,94 @@
+# Environment Stack Root
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Mappings:
+  environmentSpecificValues:
+    'YOUR_ACCOUNT_ID':
+      environmentName: _STAGE_
+      usersAPIDomainName: users._DOMAIN_
+    'YOUR_ACCOUNT_ID_2':
+      environmentName: _STAGE_
+      usersAPIDomainName: users._STAGE_._DOMAIN_
+
+Resources:
+
+  eventBusesStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./event-buses.yaml
+#      Parameters:
+#        meetBelUsersAthenaDBName: !FindInMap [ environmentSpecificValues, !Ref "AWS::AccountId", meetBelUsersAthenaDBName ]
+
+  systemNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: systemNotificationTopic
+      Subscription:
+        -
+          Endpoint: "your_email"
+          Protocol: "email"
+
+  logBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: Private
+      BucketName: !Join [ "-", [ !Ref "AWS::Region", !Ref "AWS::AccountId", "logs" ] ]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+
+Outputs:
+
+  _DOMAIN_SSLCertificateUSEast1:
+    Description: ARN for the _DOMAIN_ComSSLCertificateUSEast1 ACM Certificate
+    Value: "arn:aws:acm:us-east-1:someAccountId:certificate/{id}"
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_SSLCertificateUSEast1"
+
+  _DOMAIN_SSLSSLCertificateEUWest2:
+    Description: ARN for the _DOMAIN_ComSSLSSLCertificate In EU West 2 London
+    Value: "arn:aws:acm:eu-west-2:someAccountId:certificate/{id}"
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_SSLSSLCertificateEUWest2"
+
+  _DOMAIN_ComHostedZoneID:
+    Description: Route 53 Hosted ZoneID For the _DOMAIN_ domain
+    Value: "__VALUE_HERE__"
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_HostedZoneID"
+
+  systemNotificationTopic:
+    Description: SNS Topic for system notifications to system admins
+    Value: !Ref systemNotificationTopic
+    Export:
+      Name: !Sub "${AWS::StackName}--systemNotificationTopic"
+
+  _DOMAIN_logBucketRegionalDomainName:
+    Description: Regional domain name for _DOMAIN_ log web log bucket
+    Value: !GetAtt logBucket.RegionalDomainName
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_logBucketRegionalDomainName"
+
+  _DOMAIN_logBucketDomainName:
+    Description: Domain name for _DOMAIN_ log web log bucket
+    Value: !GetAtt logBucket.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_logBucketDomainName"
+
+  _DOMAIN_CorporateWebsiteRootDomain:
+    Description: Root domain for _DOMAIN_ corporate website for current environment
+    Value: "meetbel.com"
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_CorporateWebsiteRootDomain"
+
+  _DOMAIN_EventsFirehose:
+    Description: _DOMAIN_ events firehose
+    Value: "arn:aws:firehose:eu-west-2:someAccountId:deliverystream/_DOMAIN_EventsDeliveryStream"
+    Export:
+      Name: !Sub "${AWS::StackName}--_DOMAIN_EventsFirehose"
+
