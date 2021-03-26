@@ -1,0 +1,26 @@
+# Event Buses Stack
+# SNS and Event Bridge
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  ImageConversionServiceEvents:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: ImageConversionService-Events
+
+Outputs:
+
+  usersEventBusName:
+    Description: Name of the Users Event Bus
+    Value: "usersEventBus"
+    Export:
+      Name: !Sub "${AWS::StackName}--usersEventBusName"
+
+  imageConversionServiceEventsSNSTopicARN:
+    Description: ARN for the imageConversionService Events SNS Topic
+    Value: !Ref ImageConversionServiceEvents
+    Export:
+      Name: !Sub "${AWS::StackName}--imageConversionServiceEventsSNSTopicARN"
