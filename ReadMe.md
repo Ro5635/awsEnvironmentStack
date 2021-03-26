@@ -1,5 +1,5 @@
 # aws Environment Stack 
-### Sort Of Template I guess 🤷‍♂️
+### Sort Of a Template I guess 🤷‍♂️
 
 This is a starter environment stack, it contains the minimal components I tend to want in an aws account that I use, replace the `_DOMAIN_` with the target domain and complete the stack. This is meant to be a re-usable base but needs some manual work to make this useful, but this is a decent start for a copy paste when bootstraping a new project.
 
